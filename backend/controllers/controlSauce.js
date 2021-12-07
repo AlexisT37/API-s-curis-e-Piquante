@@ -2,11 +2,17 @@ const Sauce = require('../models/Sauce');
 
 exports.createSauce = (req, res, next) => {
     const sauce = new Sauce({
-        title: req.body.title,
+        userId: req.body.userId,
+        name: req.body.name,
+        manufacturer: req.body.manufacturer,
         description: req.body.description,
+        mainPepper: req.body.mainPepper,
         imageUrl: req.body.imageUrl,
-        price: req.body.price,
-        userId: req.body.userId
+        heat: req.body.heat,
+        likes: req.body.likes,
+        dislikes: req.body.dislikes,
+        usersLiked: req.body.usersLiked,
+        usersDisliked: req.body.usersDisliked
     });
     sauce.save().then(
         () => {
@@ -42,11 +48,17 @@ exports.getOneSauce = (req, res, next) => {
 exports.modifySauce = (req, res, next) => {
     const sauce = new Sauce({
         _id: req.params.id,
-        title: req.body.title,
+        userId: req.body.userId,
+        name: req.body.name,
+        manufacturer: req.body.manufacturer,
         description: req.body.description,
+        mainPepper: req.body.mainPepper,
         imageUrl: req.body.imageUrl,
-        price: req.body.price,
-        userId: req.body.userId
+        heat: req.body.heat,
+        likes: req.body.likes,
+        dislikes: req.body.dislikes,
+        usersLiked: req.body.usersLiked,
+        usersDisliked: req.body.usersDisliked
     });
     Sauce.updateOne({
         _id: req.params.id
@@ -83,7 +95,7 @@ exports.deleteSauce = (req, res, next) => {
     );
 };
 
-exports.getAllStuff = (req, res, next) => {
+exports.getAllSauces = (req, res, next) => {
     Sauce.find().then(
         (sauces) => {
             res.status(200).json(sauces);

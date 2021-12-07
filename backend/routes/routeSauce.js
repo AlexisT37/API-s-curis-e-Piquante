@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-const stuffCtrl = require('../controllers/stuff');
+const stuffCtrl = require('../controllers/controlSauce');
 
-router.get('/', stuffCtrl.getAllStuff);
+router.get('/', stuffCtrl.getAllSauces);
 router.post('/', stuffCtrl.createSauce);
 router.get('/:id', stuffCtrl.getOneSauce);
 router.put('/:id', stuffCtrl.modifySauce);

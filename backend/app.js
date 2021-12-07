@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const app = express();
 
-const stuffRoutes = require('./routes/stuff');
+const sauceRoutes = require('./routes/routeSauce');
 
 
 
@@ -27,6 +27,6 @@ app.use((req, res, next) => {
 
 
 
-app.use('/api/stuff', stuffRoutes);
+app.use('/api/sauces', sauceRoutes);
 
 module.exports = app;
