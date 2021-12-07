@@ -33,7 +33,7 @@ app.post('/api/stuff', (req, res, next) => {
     });
     sauce.save()
         .then(() => res.status(201).json({
-            message: 'Objet enregistré !'
+            message: 'Sauce enregistré !'
         }))
         .catch(error => res.status(400).json({
             error
@@ -48,7 +48,7 @@ app.put('/api/stuff/:id', (req, res, next) => {
             _id: req.params.id
         })
         .then(() => res.status(200).json({
-            message: 'Objet modifié !'
+            message: 'Sauce modifié !'
         }))
         .catch(error => res.status(400).json({
             error
@@ -60,7 +60,7 @@ app.delete('/api/stuff/:id', (req, res, next) => {
             _id: req.params.id
         })
         .then(() => res.status(200).json({
-            message: 'Objet supprimé !'
+            message: 'Sauce supprimé !'
         }))
         .catch(error => res.status(400).json({
             error
