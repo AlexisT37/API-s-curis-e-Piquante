@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 
-const stuffCtrl = require('../controllers/controlSauce');
+const sauceCtrl = require('../controllers/controlSauce');
 
-router.get('/', stuffCtrl.getAllSauces);
-router.post('/', stuffCtrl.createSauce);
-router.get('/:id', stuffCtrl.getOneSauce);
-router.put('/:id', stuffCtrl.modifySauce);
-router.delete('/:id', stuffCtrl.deleteSauce);
+router.get('/', sauceCtrl.getAllSauces);
+router.post('/', sauceCtrl.createSauce);
+router.get('/:id', sauceCtrl.getOneSauce);
+router.put('/:id', sauceCtrl.modifySauce);
+router.delete('/:id', sauceCtrl.deleteSauce);
 
 module.exports = router;
