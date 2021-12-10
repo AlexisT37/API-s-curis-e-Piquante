@@ -16,6 +16,7 @@ const Sauce = require('../models/Sauce');
 
 /* on crée une sauce en suivant l'instantiation du schéma */
 exports.createSauce = (req, res, next) => {
+    console.log(req.body);
 
     delete req.body._id;
     /* on exporte la sauce */
