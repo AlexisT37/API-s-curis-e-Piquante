@@ -13,6 +13,9 @@ const sauceRoutes = require('./routes/routeSauce');
 const userRoutes = require('./routes/user');
 
 
+const path = require('path');
+
+
 /* on se connecte a mongoose avec notre compte mongodb */
 mongoose.connect('mongodb+srv://hotaru18289:eren14@nodeapi.d5wge.mongodb.net/myFirstDatabase?retryWrites=true&w=majority', {
         useNewUrlParser: true,
@@ -34,6 +37,9 @@ app.use((req, res, next) => {
     next();
 });
 
+/* utiliser le chemin des images car on a besoin de l'app.js pour traiter les images */
+/* sinon il y a une erreur 404 */
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 /* utiliser sauces et auth */
 app.use('/api/sauces', sauceRoutes);

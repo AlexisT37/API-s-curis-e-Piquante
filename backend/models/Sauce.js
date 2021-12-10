@@ -10,14 +10,6 @@ const mongoose = require('mongoose');
 /* importer app.js */
 const app = require('../app');
 
-/* const listen pour ecouter */
-//todo trouver origine listen███████████████████████████████████████████████████████
-
-
-// const {
-//     listen
-// } = require('../app');
-
 /* schéma des sauces */
 const sauceSchema = mongoose.Schema({
     userId: {
@@ -41,28 +33,23 @@ const sauceSchema = mongoose.Schema({
         required: true
     },
     imageUrl: {
-        String,
-        required: false
+        String
     },
     heat: {
         type: Number,
-        required: false
+        required: true
     },
     likes: {
-        type: Number,
-        required: false
+        type: Number
     },
     dislikes: {
-        type: Number,
-        required: false
+        type: Number
     },
     usersLiked: {
-        type: String,
-        required: false
+        type: Array
     },
     usersDisliked: {
-        type: String,
-        required: false
+        type: Array
     }
 });
 

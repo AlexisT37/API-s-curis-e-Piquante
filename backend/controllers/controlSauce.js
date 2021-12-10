@@ -12,17 +12,28 @@
 
 /* importer le schéma sauce pour une sauce */
 const Sauce = require('../models/Sauce');
+const fs = require('fs');
 
 
 /* on crée une sauce en suivant l'instantiation du schéma */
 exports.createSauce = (req, res, next) => {
-    console.log(req.body);
-
-    delete req.body._id;
+    // console.log(req.body);
+    /* faire un objet avec le req.body à l'aide de JSON.parse*/
+    const sauceObject = JSON.parse(req.body.sauce)
+    /* enlever l'id de l'objet fait à partir de req.body */
+    delete sauceObject._id;
     /* on exporte la sauce */
     const sauce = new Sauce({
         /* on créée une nouvelle instantiation */
-        ...req.body
+        ...sauceObject,
+        /* générer l'image de l'image de manière dynamique */
+        /* host sera l'addresse localhost dus server */
+        /* puis l'URI de l'image, conservée dans images */
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+        likes: 0,
+        dislikes: 0,
+        usersLiked: [],
+        usersDisliked: []
     });
     sauce.save().then( /* on sauvegarde le schema */
         () => {
@@ -58,57 +69,49 @@ exports.getOneSauce = (req, res, next) => {
 };
 
 exports.modifySauce = (req, res, next) => {
-    /* modifier la sauce */
-    const sauce = new Sauce({
-        _id: req.params.id,
-        userId: req.body.userId,
-        name: req.body.name,
-        manufacturer: req.body.manufacturer,
-        description: req.body.description,
-        mainPepper: req.body.mainPepper,
-        imageUrl: req.body.imageUrl,
-        heat: req.body.heat,
-        likes: req.body.likes,
-        dislikes: req.body.dislikes,
-        usersLiked: req.body.usersLiked,
-        usersDisliked: req.body.usersDisliked
-    });
+    const sauceObject = req.file ? {
+        ...JSON.parse(req.body.sauce),
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    } : {
+        ...req.body
+    };
     Sauce.updateOne({
-        /* modifier la sauce dont la requete aura l'id correspondant */
-        _id: req.params.id
-    }, sauce).then(
-        () => {
-            res.status(201).json({
-                message: "La sauce a bien été modifiée !"
-            });
-        }
-    ).catch(
-        (error) => {
-            res.status(400).json({
-                error: error
-            });
-        }
-    );
+            _id: req.params.id
+        }, {
+            ...sauceObject,
+            _id: req.params.id
+        })
+        .then(() => res.status(200).json({
+            message: 'Sauce modifiée !'
+        }))
+        .catch(error => res.status(400).json({
+            error
+        }));
 };
 
 
 /* supprimer la sauce avec l'id correspondant */
 exports.deleteSauce = (req, res, next) => {
-    /* trouver une sauce qui a l'id de la requete */
     Sauce.findOne({
             _id: req.params.id
         })
-        .then((sauce) => {
-            Sauce.deleteOne({
-                    _id: req.params.id
-                })
-                .then(() => res.status(200).json({
-                    message: "Vous avez supprimé une sauce !"
-                }))
-                .catch((error) => res.status(400).json({
-                    error
-                }));
-        });
+        .then(sauce => {
+            const filename = sauce.imageUrl.split('/images/')[1];
+            fs.unlink(`images/${filename}`, () => {
+                Sauce.deleteOne({
+                        _id: req.params.id
+                    })
+                    .then(() => res.status(200).json({
+                        message: 'Objet supprimé !'
+                    }))
+                    .catch(error => res.status(400).json({
+                        error
+                    }));
+            });
+        })
+        .catch(error => res.status(500).json({
+            error
+        }));
 };
 
 
