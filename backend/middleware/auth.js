@@ -1,4 +1,4 @@
-/* On aurait tendence à penser que les commentaires sont là poul expliquer le code aux développeurs */
+/* On aurait tendence à penser que les commentaires sont là pour expliquer le code aux développeurs */
 /* La vérité c'est que le code est là pour expliquer les commentaires à l'ordinateur */
 
 
@@ -26,7 +26,7 @@ module.exports = (req, res, next) => {
         req.auth = {
             userId
         };
-        /* si le userid de la requete et le userId demandé ne sont pas les meme */
+        /* si le userid de la requete et le userId demandé ne sont pas les mêmes */
         if (req.body.userId && req.body.userId !== userId) {
             throw "Vous n'avez pas le bon ID";
         } else {

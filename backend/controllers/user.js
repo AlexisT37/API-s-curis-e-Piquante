@@ -1,4 +1,4 @@
-/* On aurait tendence à penser que les commentaires sont là poul expliquer le code aux développeurs */
+/* On aurait tendence à penser que les commentaires sont là pour expliquer le code aux développeurs */
 /* La vériter c'est que le code est là pour expliquer les commentaires à l'ordinateur */
 
 

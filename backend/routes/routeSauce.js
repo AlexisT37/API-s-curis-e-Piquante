@@ -30,8 +30,8 @@ const sauceCtrl = require('../controllers/controlSauce');
 /* chaque middleware est une methode de sauceCtrl */
 
 /* multer est mis après le auth afin que l'autentification soit faite avant d'uploader les images */
-router.get('/', auth, multer, sauceCtrl.getAllSauces);
-router.post('/', sauceCtrl.createSauce);
+router.get('/', auth, sauceCtrl.getAllSauces);
+router.post('/', auth, multer, sauceCtrl.createSauce);
 router.get('/:id', auth, sauceCtrl.getOneSauce);
 router.put('/:id', auth, multer, sauceCtrl.modifySauce);
 router.delete('/:id', auth, sauceCtrl.deleteSauce);

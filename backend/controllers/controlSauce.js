@@ -1,4 +1,4 @@
-/* On aurait tendence à penser que les commentaires sont là poul expliquer le code aux développeurs */
+/* On aurait tendence à penser que les commentaires sont là pour expliquer le code aux développeurs */
 /* La vériter c'est que le code est là pour expliquer les commentaires à l'ordinateur */
 
 /* ce module est un controlleur, il contient la logique metier des instructions CRUD pour les sauces */
@@ -52,6 +52,7 @@ exports.createSauce = (req, res, next) => {
     );
 };
 
+/* on affiche une sauce en utilisant l'id */
 exports.getOneSauce = (req, res, next) => {
     Sauce.findOne({
         _id: req.params.id /* trouver la sauce avec l'id utilisé lors de la requete */
@@ -68,6 +69,7 @@ exports.getOneSauce = (req, res, next) => {
     );
 };
 
+/* on modifie une sauce */
 exports.modifySauce = (req, res, next) => {
     const sauceObject = req.file ? {
         ...JSON.parse(req.body.sauce),
@@ -117,7 +119,6 @@ exports.deleteSauce = (req, res, next) => {
 
 /* montrer toutes les sauces */
 exports.getAllSauces = (req, res, next) => {
-    /* showing all sauces */
     Sauce.find().then(
         (sauces) => {
             res.status(200).json(sauces);
