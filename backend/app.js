@@ -4,6 +4,8 @@
 /* message gris a cause de ES6 */
 const express = require('express');
 const mongoose = require('mongoose');
+/* helmet pour la sécurité de l'application */
+const helmet = require('helmet');
 
 /* intercepte toutes les requètes qui ont un content type json */
 /* met a disposition le contenu de cette requète dans req.body */
@@ -15,12 +17,17 @@ const userRoutes = require('./routes/user');
 
 const path = require('path');
 
+/* import de dotenv pour la connection a mongoose */
+require('dotenv').config();
+
 
 /* on se connecte a mongoose avec notre compte mongodb */
-mongoose.connect('mongodb+srv://hotaru18289:eren14@nodeapi.d5wge.mongodb.net/myFirstDatabase?retryWrites=true&w=majority', {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    })
+/* on utilise .env pour ne pas avoir le code dans github */
+mongoose.connect(
+        process.env.SECRET_MONGO, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        })
     .then(() => console.log('Connexion à MongoDB réussie !'))
     .catch(() => console.log('Connexion à MongoDB échouée !'));
 
@@ -36,6 +43,9 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();
 });
+
+/* utilisation de helmet par l'app */
+app.use(helmet());
 
 /* utiliser le chemin des images car on a besoin de l'app.js pour traiter les images */
 /* sinon il y a une erreur 404 */

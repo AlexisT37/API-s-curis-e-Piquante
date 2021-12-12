@@ -24,6 +24,7 @@ const router = express.Router();
 /* ils contiennent la logique metier des routes */
 const sauceCtrl = require('../controllers/controlSauce');
 
+
 /* routes pour le CRUD avec une implantation modulaire et raccourcie */
 /* on a des URI raccourcies pour plus de simplicité */
 /* en deuxieme argument on a l'import des middlewares dans controlSauces */

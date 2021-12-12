@@ -30,6 +30,8 @@ exports.createSauce = (req, res, next) => {
         /* host sera l'addresse localhost dus server */
         /* puis l'URI de l'image, conservée dans images */
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+        /* on initialise les likes et dislike a un entier nul, et la liste des utilisateurs qui */
+        /* likent et dislike à une liste vide */
         likes: 0,
         dislikes: 0,
         usersLiked: [],
@@ -71,6 +73,10 @@ exports.getOneSauce = (req, res, next) => {
 
 /* on modifie une sauce */
 exports.modifySauce = (req, res, next) => {
+    /* on utilise l'opérateur ternaire ? qui permet de faire la forme suivante*/
+    /* condition ? si vrai: si faux */
+    /* de fait, si on a bosoin de changer l'image alors on configure l'URI */
+    /* autrement on utilise seulement le corps de la requète */
     const sauceObject = req.file ? {
         ...JSON.parse(req.body.sauce),
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
@@ -78,6 +84,7 @@ exports.modifySauce = (req, res, next) => {
         ...req.body
     };
     Sauce.updateOne({
+            /* on met a jour l'objet sauceObject en utilisant l'id de la requete */
             _id: req.params.id
         }, {
             ...sauceObject,
@@ -97,24 +104,38 @@ exports.deleteSauce = (req, res, next) => {
     Sauce.findOne({
             _id: req.params.id
         })
-        .then(sauce => {
-            const filename = sauce.imageUrl.split('/images/')[1];
-            fs.unlink(`images/${filename}`, () => {
-                Sauce.deleteOne({
-                        _id: req.params.id
-                    })
-                    .then(() => res.status(200).json({
-                        message: 'Objet supprimé !'
-                    }))
-                    .catch(error => res.status(400).json({
-                        error
-                    }));
-            });
-        })
+        .then(
+            (sauce) => {
+                if (!sauce) {
+                    return res.status(404).json({
+                        error: new Error('Sauce non trouvée')
+                    });
+                }
+                if (sauce.userId != req.ath.userId) {
+                    return res.status(401).json({
+                        error: new Error('Requête non autorisée')
+                    });
+                }
+                const filename = sauce.imageUrl.split('/images/')[1];
+                fs.unlink(`images/${filename}`, () => {
+                    Sauce.deleteOne({
+                            _id: req.params.id
+                        })
+                        .then(() => res.status(200).json({
+                            message: 'Sauce supprimée !'
+                        }))
+                        .catch(error => res.status(400).json({
+                            error
+                        }));
+                });
+            })
         .catch(error => res.status(500).json({
             error
         }));
 };
+
+
+
 
 
 /* montrer toutes les sauces */

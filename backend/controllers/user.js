@@ -18,6 +18,8 @@ const User = require('../models/User');
 /* pour augmenter la sécurité de l'identification de l'utilisateurr */
 const jwt = require('jsonwebtoken');
 
+
+
 /* créer un nouvel utilisateur */
 exports.signup = (req, res, next) => {
     /* hasher le mot de passe avec un degré 10 de salaison */
