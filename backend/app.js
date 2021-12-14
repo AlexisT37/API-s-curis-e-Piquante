@@ -1,5 +1,5 @@
 /* On aurait tendence à penser que les commentaires sont là poul expliquer le code aux développeurs */
-/* La vériter c'est que le code est là pour expliquer les commentaires à l'ordinateur */
+/* La vérité c'est que le code est là pour expliquer les commentaires à l'ordinateur */
 
 /* message gris a cause de ES6 */
 const express = require('express');
@@ -11,14 +11,32 @@ const helmet = require('helmet');
 /* met a disposition le contenu de cette requète dans req.body */
 const app = express();
 
+/* importer les routes */
 const sauceRoutes = require('./routes/routeSauce');
 const userRoutes = require('./routes/user');
 
+/* on utilise mongo-sanitize pour empêcher les injections de query selector */
+const mongoSanitize = require('express-mongo-sanitize');
 
+/* importer express-rate-limit pour limiter le nombre de requêtes dans une période donnée */
+const rateLimit = require("express-rate-limit");
+
+
+/* importer le module path pour les images */
 const path = require('path');
 
 /* import de dotenv pour la connection a mongoose */
 require('dotenv').config();
+
+
+/* on a une limite de 100 requêtes dans une période de 15 minutes */
+const limiter = rateLimit({
+    /* minutes * secondes * milisecondes */
+    windowMs: 15 * 60 * 1000, // 15 minutes
+
+    /* on configure le nombre de requêtes autorisées par windowMs, ici 100 */
+    max: 100 // limit each IP to 100 requests per windowMs
+});
 
 
 /* on se connecte a mongoose avec notre compte mongodb */
@@ -35,6 +53,11 @@ mongoose.connect(
 /* pour pouvoir utiliser express */
 app.use(express.json());
 
+/* utiliser le limiteur de 100 requêtes pour 15 minutes  */
+app.use(limiter);
+
+/* app.js va utiliser express mongo sanitize */
+app.use(mongoSanitize());
 
 /* headers pour pouvoir autorizer les requetes */
 app.use((req, res, next) => {

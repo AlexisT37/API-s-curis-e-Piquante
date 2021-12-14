@@ -1,5 +1,5 @@
 /* On aurait tendence à penser que les commentaires sont là pour expliquer le code aux développeurs */
-/* La vériter c'est que le code est là pour expliquer les commentaires à l'ordinateur */
+/* La vérité c'est que le code est là pour expliquer les commentaires à l'ordinateur */
 
 
 /* ce module est un controlleur, il contient la logique metier */
@@ -18,10 +18,49 @@ const User = require('../models/User');
 /* pour augmenter la sécurité de l'identification de l'utilisateurr */
 const jwt = require('jsonwebtoken');
 
+/* import passwordValidator to check if the password is strong enough */
+
+
+
+const passwordValidator = require('password-validator');
+const mdpSchema = new passwordValidator();
+
+mdpSchema
+    .is().min(8) // Minimum length 8
+    .is().max(100) // Maximum length 100
+    .has().uppercase() // Must have uppercase letters
+    .has().lowercase() // Must have lowercase letters
+    .has().digits(2) // Must have at least 2 digits
+    .has().not().spaces() // Should not have spaces
+
+
+
+/* on importe le validateur d'email */
+const validator = require("email-validator");
+
 
 
 /* créer un nouvel utilisateur */
 exports.signup = (req, res, next) => {
+    /* mettre des conditions pour que le mot de passe et l'addresse email soient conformes */
+    /* on utilise emailvalidator pour scanner la propriété email de req.body */
+    /* condition si l'email N'EST PAS VALIDE */
+    if (!validator.validate(req.body.email)) {
+        return res.status(401).json({
+            message: "ce n'est pas un email valide"
+        })
+    }
+
+    /* même chose pour le mot de passe, on crée une condition */
+    /* si le mot de passe n'est pas valide, cad il n'est pas assez complexe */
+    if (!mdpSchema.validate(req.body.password)) {
+        return res.status(401).json({
+            message: "Il faut des minuscules, majuscules, nombres et pas d'espace à votre mot de passe"
+        })
+    }
+
+    /* si aucune de ces 2 conditions n'est exécutée, alors on peut passer à la suite */
+
     /* hasher le mot de passe avec un degré 10 de salaison */
     bcrypt.hash(req.body.password, 10)
         /* retourner une promise */
@@ -59,7 +98,7 @@ exports.login = (req, res, next) => {
     User.findOne({
             email: req.body.email
         })
-        .then(user => {
+        .then((user) => {
             /* si l'email n'existe pas dans */
             /* la base de données */
             if (!user) {
@@ -72,7 +111,7 @@ exports.login = (req, res, next) => {
             /* dans la base de données */
             bcrypt.compare(req.body.password, user.password)
                 /* promise pour le mot de passe */
-                .then(valid => {
+                .then((valid) => {
                     /* si ce n'est pas le bon mot de passe */
                     if (!valid) {
                         return res.status(401).json({
@@ -96,12 +135,12 @@ exports.login = (req, res, next) => {
                     });
                 })
                 /* erreur 500 si on arrive pas chercher un utilisateur */
-                .catch(error => res.status(500).json({
+                .catch((error) => res.status(500).json({
                     error
                 }));
         })
         /* erreur 500 si on arrive pas a démarrer la requete*/
-        .catch(error => res.status(500).json({
+        .catch((error) => res.status(500).json({
             error
         }));
 };

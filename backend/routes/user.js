@@ -1,5 +1,5 @@
 /* On aurait tendence à penser que les commentaires sont là poul expliquer le code aux développeurs */
-/* La vériter c'est que le code est là pour expliquer les commentaires à l'ordinateur */
+/* La vérité c'est que le code est là pour expliquer les commentaires à l'ordinateur */
 
 const express = require('express');
 const router = express.Router();
