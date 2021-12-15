@@ -119,3 +119,15 @@ exports.getAllSauces = (req, res, next) => {
             error
         }));
 };
+
+exports.likerSauce = (req, res, next) => {
+    sauce.findOne({
+            _id: req.params.id
+        })
+        .then(sauce => {
+            console.log(sauce);
+            console.log(sauce.usersLiked);
+            console.log(sauce.usersDisliked);
+            console.log(req.body.userId);
+        })
+}
