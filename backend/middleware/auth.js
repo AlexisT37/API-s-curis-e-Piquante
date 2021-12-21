@@ -14,7 +14,7 @@ module.exports = (req, res, next) => {
     /* avoir juste le webtoken avec le 2eme element du tableau et pas bearer */
     const token = req.headers.authorization.split(" ")[1];
     /* decoder le token avec le seed */
-    const decodedToken = jwt.verify(token, "RANDOM_TOKEN_SECRET");
+    const decodedToken = jwt.verify(token, process.env.MONTOKEN);
     /* assigner l'userid a celui donné dans le token */
     /* le token décodé est un objet qui a deux propriétés, et là */
     /* on veut la propriété userId */
