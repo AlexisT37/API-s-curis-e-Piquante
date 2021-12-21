@@ -5,8 +5,9 @@
 /* il contient les routes pour le CRUD des sauces. */
 /* l'autre module, user.js est pour le CRUD des utilisateurs */
 
+/* importer express.js qui est un framework pour créer des serveurs */
 /* message gris a cause de ES6 */
-const express = require('express');
+const express = require("express");
 
 /* fonction router de express */
 /* instance d'objet de middlewares et de routes */
@@ -14,15 +15,14 @@ const express = require('express');
 const router = express.Router();
 
 /* importer auth afin de sécuriser les routes */
-const auth = require('../middleware/auth');
+const auth = require("../middleware/auth");
 
 /* importer multer afin de gérer l'upload des images */
-const multer = require('../middleware/multer-config');
+const multer = require("../middleware/multer-config");
 
 /* import des middlewares dans le controller */
 /* ils contiennent la logique metier des routes */
-const sauceCtrl = require('../controllers/controlSauce');
-
+const sauceCtrl = require("../controllers/controlSauce");
 
 /* routes pour le CRUD avec une implantation modulaire et raccourcie */
 /* on a des URI raccourcies pour plus de simplicité */
@@ -30,13 +30,12 @@ const sauceCtrl = require('../controllers/controlSauce');
 /* chaque middleware est une methode de sauceCtrl */
 
 /* multer est mis après le auth afin que l'autentification soit faite avant d'uploader les images */
-router.post('/', auth, multer, sauceCtrl.createSauce);
-router.get('/:id', auth, sauceCtrl.getOneSauce);
-router.get('/', auth, sauceCtrl.getAllSauces);
-router.put('/:id', auth, multer, sauceCtrl.modifySauce);
-router.delete('/:id', auth, sauceCtrl.deleteSauce);
-router.post('/:id/like', auth, sauceCtrl.likerSauce);
-
+router.post("/", auth, multer, sauceCtrl.createSauce);
+router.get("/:id", auth, sauceCtrl.getOneSauce);
+router.get("/", auth, sauceCtrl.getAllSauces);
+router.put("/:id", auth, multer, sauceCtrl.modifySauce);
+router.delete("/:id", auth, sauceCtrl.deleteSauce);
+router.post("/:id/like", auth, sauceCtrl.likerSauce);
 
 /* exportation sous le nom router */
 module.exports = router;

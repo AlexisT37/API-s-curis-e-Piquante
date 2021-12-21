@@ -6,11 +6,14 @@
 /* il sera importé dans routeSauce.js */
 /* c'est-à-dire que l'import utilisera la syntaxe import.middleware */
 
-/* il y a 5 routes:  */
-/* créer une sauce, lire une sauce, modifier une sauce, effacer une sauce, lire toutes les sauces */
+/* il y a 6 routes:  */
+/* créer une sauce, lire une sauce, modifier une sauce, effacer une sauce, lire toutes les sauces, liker ou disliker une sauce */
 
 /* importer le schéma sauce pour une sauce */
 const Sauce = require("../models/Sauce");
+
+/* import de fs, qui veut dire File system ou système de fichier */
+/* pour manipuler les fichiers */
 const fs = require("fs");
 
 /* on crée une sauce en suivant l'instantiation du schéma */
@@ -25,8 +28,7 @@ exports.createSauce = (req, res, next) => {
     ...sauceObject,
     /* générer l'image de l'image de manière dynamique */
     /* host sera l'addresse localhost dus server */
-    /* puis l'URI de l'image, conservée dans images */
-    /* protocol sera le protocole, http ou https */
+    /* puis l'URI de l'image */
     imageUrl: `${req.protocol}://${req.get("host")}/images/${
       req.file.filename
     }`,
@@ -42,7 +44,7 @@ exports.createSauce = (req, res, next) => {
     /* on sauvegarde le schema */
     .then(() =>
       res.status(201).json({
-        /* obtenir le status de la requete en json */
+        /* obtenir le status de la requête en json */
         message: "Vous avez créé une nouvelle sauce !",
       })
     )
@@ -56,6 +58,7 @@ exports.createSauce = (req, res, next) => {
 
 /* on affiche une sauce en utilisant l'id */
 exports.getOneSauce = (req, res, next) => {
+  /* query mongoose pour trouver un document selon les paramètres indiqués, ici l'id de la requête */
   Sauce.findOne({
     _id: req.params.id,
   })
@@ -69,53 +72,52 @@ exports.getOneSauce = (req, res, next) => {
 
 /* on modifie une sauce */
 exports.modifySauce = (req, res, next) => {
-  /* on utilise l'opérateur ternaire ? qui permet de faire la forme suivante*/
-  /* condition ? si vrai: si faux */
-  /* de fait, si on a bosoin de changer l'image alors on configure l'URI */
-  /* autrement on utilise seulement le corps de la requète */
-  const sauceObject = req.file
-    ? {
-        ...JSON.parse(req.body.sauce),
-        imageUrl: `${req.protocol}://${req.get("host")}/images/${
-          req.file.filename
-        }`,
-      }
-    : {
-        ...req.body,
-      };
-  Sauce.updateOne(
-    {
-      /* on met a jour l'objet sauceObject en utilisant l'id de la requete */
-      _id: req.params.id,
-    },
-    {
-      ...sauceObject,
-      _id: req.params.id,
-    }
+  /* on déclare un object vide */
+  let sauceObject = {};
+  /* initialiser marqueur pour vérifier */
+  /* si on a une nouvelle image */
+  let newImg = false;
+  /* si on a un fichier dans la requête, c'est a dire qu'on a une nouvelle image */
+  if (req.file) {
+    /* marqueur devient vrai */
+    newImg = true;
+    /* on modifie sauceObject */
+    sauceObject = {
+      /* de façon à ce qu'il ait la nouvelle image */
+      ...JSON.parse(req.body.sauce),
+      imageUrl: `${req.protocol}://${req.get("host")}/images/${
+        req.file.filename
+      }`,
+    };
+    /* si il n'y a pas de nouvelle image */
+  } else {
+    /* sauceObjet restera pareil sauf pour les autres changements que l'on souhaite faire */
+    sauceObject = { ...req.body };
+  }
+
+  /* on va trouver notre sauce et la mettre a jour */
+  /* on met a jour l'objet sauceObject en utilisant l'id de la requete */
+  Sauce.findOneAndUpdate(
+    { _id: req.params.id },
+    { ...sauceObject, _id: req.params.id }
   )
     .then((sauce) => {
-      console.log(sauce);
-      console.log(req.body.sauce);
-      console.log(req.body.sauce.imgUrl);
-      console.log(sauce.imageUrl);
-      if (req.body.imgUrl !== sauce.imageUrl) {
-        const filenamedelete = req.body.sauce.imageUrl.split("/images/")[1];
-        fs.unlink(`images/${filenamedelete}`, () =>
-          res.status(201).json({
-            message: "Sauce supprimée",
-          })
-        );
+      /* si le marqueur de nouvelle image est vrai */
+      if (newImg == true) {
+        /* on trouve le nom de l'ancienne image */
+        const filenamedelete = sauce.imageUrl.split("/images/")[1];
+        /* on suprime l'ancienne image a l'aide de la fonction unlink de fs */
+        fs.unlink(`images/${filenamedelete}`, (error) => {
+          if (error) throw error;
+        });
+        /* une fois le middleware terminé, le prochan newImg sera initialisé à false */
       }
+
       res.status(200).json({
         message: "Sauce modifiée !",
       });
     })
-
-    .catch((error) =>
-      res.status(400).json({
-        error,
-      })
-    );
+    .catch((error) => res.status(400).json({ error }));
 };
 
 /* supprimer la sauce avec l'id correspondant */
@@ -157,13 +159,9 @@ exports.likerSauce = (req, res, next) => {
   })
     .then((sauce) => {
       console.log(req.body);
-      // console.log(sauce);
-      // console.log(sauce.usersLiked);
-      // console.log(sauce.usersDisliked);
-      // console.log(req.body.userId);
       /* si la requète like est 1 */
       if (req.body.like === 1) {
-        /* utilisation de la méthode updateone avec en paramètres l'id de la sauce de la requète */
+        /* utilisation de la méthode updateone avec en paramètres l'id de la sauce de la requête */
         /* ainsi que les instructions */
         /* on va utiliser $push qui est la même chose que append dans python */
         /* c'est-à-dire ajouter un élément à la fin du tableau */
@@ -175,7 +173,7 @@ exports.likerSauce = (req, res, next) => {
         )
           .then(() => res.status(200).json({ message: `Sauce likée` }))
           .catch((error) => res.status(400).json({ error }));
-        /* sinon, si  la requète like est 1 */
+        /* sinon, si  la requète like est -1 */
       } else if (req.body.like == -1) {
         Sauce.updateOne(
           /* on fait l'inverse, on ajoute l'id à la fin du tableau des utilisateurs qui dislikent */
