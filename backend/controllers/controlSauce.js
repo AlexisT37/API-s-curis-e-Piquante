@@ -122,6 +122,16 @@ exports.modifySauce = (req, res, next) => {
 
 /* supprimer la sauce avec l'id correspondant */
 exports.deleteSauce = (req, res, next) => {
+  Sauce.findOne({ _id: req.params.id }).then((sauce) => {
+    if (!sauce) {
+      return res.status(404).json({ error: new Error("Sauce non trouvée") });
+    }
+    if (sauce.userId !== req.auth.userId) {
+      return res.status(401).json({
+        error: new Error("Requête non autorisée"),
+      });
+    }
+  });
   /* trouver l'id de la sauce et supprimer */
   Sauce.findByIdAndRemove(req.params.id)
     .then((deleted) => {
