@@ -137,7 +137,7 @@ exports.login = (req, res, next) => {
                 userId: user._id,
               },
               /* chaine de caractere qui sera le seed du token */
-              "RANDOM_TOKEN_SECRET",
+              process.env.MONTOKEN,
               {
                 /* le token ne sera plus valide dans 24h */
                 expiresIn: "24h",

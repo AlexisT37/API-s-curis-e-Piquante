@@ -18,6 +18,7 @@ const fs = require("fs");
 
 /* on crée une sauce en suivant l'instantiation du schéma */
 exports.createSauce = (req, res, next) => {
+  // console.log(req.body);
   /* faire un objet avec le req.body à l'aide de JSON.parse*/
   const sauceObject = JSON.parse(req.body.sauce);
   /* enlever l'id de l'objet fait à partir de req.body */
@@ -48,12 +49,7 @@ exports.createSauce = (req, res, next) => {
         message: "Vous avez créé une nouvelle sauce !",
       })
     )
-    .catch((error) =>
-      res.status(400).json({
-        /* indiquer les erreurs au format json */
-        error,
-      })
-    );
+    .catch((error) => res.status(400).json({ error }));
 };
 
 /* on affiche une sauce en utilisant l'id */
@@ -122,6 +118,7 @@ exports.modifySauce = (req, res, next) => {
 
 /* supprimer la sauce avec l'id correspondant */
 exports.deleteSauce = (req, res, next) => {
+  // console.log(req.body);
   Sauce.findOne({ _id: req.params.id }).then((sauce) => {
     if (!sauce) {
       return res.status(404).json({ error: new Error("Sauce non trouvée") });
@@ -177,22 +174,33 @@ exports.likerSauce = (req, res, next) => {
         /* c'est-à-dire ajouter un élément à la fin du tableau */
         /* on utilise $inc qui vient de incrémenter */
         /* on va donc incrémenter les likes de 1 */
-        Sauce.updateOne(
-          { _id: req.params.id },
-          { $push: { usersLiked: req.body.userId }, $inc: { likes: +1 } }
-        )
-          .then(() => res.status(200).json({ message: `Sauce likée` }))
-          .catch((error) => res.status(400).json({ error }));
+        if (!sauce.usersLiked.includes(req.body.userId)) {
+          Sauce.updateOne(
+            { _id: req.params.id },
+            { $push: { usersLiked: req.body.userId }, $inc: { likes: +1 } }
+          )
+            .then(() => res.status(200).json({ message: `Sauce likée` }))
+            .catch((error) => res.status(400).json({ error }));
+        } else {
+          res.status(400).json({ message: `sauce déjà likée` });
+        }
         /* sinon, si  la requète like est -1 */
       } else if (req.body.like == -1) {
-        Sauce.updateOne(
-          /* on fait l'inverse, on ajoute l'id à la fin du tableau des utilisateurs qui dislikent */
-          /* et on incrémente les dislikes de 1 */
-          { _id: req.params.id },
-          { $push: { usersDisliked: req.body.userId }, $inc: { dislikes: +1 } }
-        )
-          .then(() => res.status(200).json({ message: `Sauce dislikée` }))
-          .catch((error) => res.status(400).json({ error }));
+        if (!sauce.usersDisliked.includes(req.body.userId)) {
+          Sauce.updateOne(
+            /* on fait l'inverse, on ajoute l'id à la fin du tableau des utilisateurs qui dislikent */
+            /* et on incrémente les dislikes de 1 */
+            { _id: req.params.id },
+            {
+              $push: { usersDisliked: req.body.userId },
+              $inc: { dislikes: +1 },
+            }
+          )
+            .then(() => res.status(200).json({ message: `Sauce dislikée` }))
+            .catch((error) => res.status(400).json({ error }));
+        } else {
+          res.status(400).json({ message: `sauce déjà dislikée` });
+        }
         /* si la requète like est a 0, c'est-à-dire qu'on ne veut ni liker ni disliker */
       } else if (req.body.like === 0) {
         Sauce.findOne({ _id: req.params.id })
